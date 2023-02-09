@@ -1,5 +1,5 @@
 # How to use
-1. export ${BOT_TOKEN}
+1. export ${BOT_TOKEN} (check the file .env)
 2. Run ngrok: `ngrok http 8000`
 3. Paste url from ngrok (https://69f4-100-2-209-180.ngrok.io) into postman "Webex -> Update webhook -> targetUrl"  
 NOTE: update only base url. Leave /message-events  
