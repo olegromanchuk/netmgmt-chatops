@@ -1,3 +1,6 @@
+IOS XE version 16.9 - Fuji
+
+
 # How to use
 1. export ${BOT_TOKEN} (check the file .env)
 2. Run ngrok: `ngrok http 8000`
