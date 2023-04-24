@@ -1,4 +1,4 @@
-IOS XE version 16.9 - Fuji
+IOS XE version 16.09 - Fuji
 
 
 # How to use
@@ -13,7 +13,7 @@ curl --location --request PUT 'https://webexapis.com/v1/webhooks/Y2lzY29zcGFyazo
 --header 'Content-Type: application/json' \
 --data-raw '{
   "name": "webhookNetMgmt",
-  "targetUrl": "https://feba-100-2-209-180.ngrok.io/message-events"
+  "targetUrl": "https://e1a3-100-2-209-180.ngrok-free.app/message-events"
 }'
 ```
 4. start the app: `./flask_server.py`
@@ -40,6 +40,12 @@ curl --location --request POST 'https://webexapis.com/v1/webhooks' \
   "event": "created"
 }'
 ``` 
+
+
+## Docker version
+IMAGE_VERSION=netmgmtchatops:version1.0
+docker build -t ${IMAGE_VERSION} .
+docker run -p 8000:8000 -e BOT_TOKEN=${BOT_TOKEN} --name netmgmtchatops ${IMAGE_VERSION}
 
 
 ## Debug in Visual Studio Code
