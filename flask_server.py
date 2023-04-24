@@ -3,8 +3,10 @@
 from flask import Flask
 from flask import jsonify
 from flask import request
-import datetime as dt
 from messenger import Messenger
+import datetime as dtc
+import os
+import sys
 
 app = Flask(__name__)
 
@@ -62,4 +64,7 @@ def welcomeRoot():
     return
 
 if __name__ == '__main__':
+    if os.getenv('BOT_TOKEN') is None:
+        print("Please set the BOT_TOKEN environment variable")
+        sys.exit(1)
     app.run(host='0.0.0.0', port=8000)
