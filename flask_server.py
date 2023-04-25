@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from flask import Flask
 from flask import jsonify
@@ -64,7 +64,7 @@ def welcomeRoot():
     return
 
 if __name__ == '__main__':
-    if os.getenv('BOT_TOKEN') is None:
+    if os.getenv('BOT_TOKEN') is None or os.getenv('BOT_TOKEN') == '':
         print("Please set the BOT_TOKEN environment variable")
         sys.exit(1)
     app.run(host='0.0.0.0', port=8000)
