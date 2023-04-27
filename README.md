@@ -1,6 +1,3 @@
-IOS XE version 16.09 - Fuji
-
-
 # How to use
 1. export ${BOT_TOKEN} (check the file .env)
 2. Run ngrok: `ngrok http 8000`
@@ -35,7 +32,7 @@ curl --location --request POST 'https://webexapis.com/v1/webhooks' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "name": "webhookNetMgmt",
-  "targetUrl": "https://42ad-100-2-209-180.ngrok.io/message-events",
+  "targetUrl": "https://9554-100-2-209-180.ngrok-free.app/message-events",
   "resource": "messages",
   "event": "created"
 }'
@@ -76,4 +73,18 @@ Then, in VS Code, open .vscode/launch.json file, and replace the values as menti
 
 Now, select the chatops.py 
 and hit F5 to run the "ChatOps" launch configuration, or by clicking the ChatOps Debug configuration.
+
+
+## Restconf for local development
+Works starting from IOS XE version 16.06
+# Next line will forward traffic on bastion host 8443->443 to cisco.with.ios-xe.restconf.host
+# same as iptables -t nat -A PREROUTING -p tcp --dport 8443 -j DNAT --to-destination 192.168.1.100:443
+
+``sudo ssh -L 8443:cisco.with.ios-xe.restconf.host:443 root@bastion.host -N``
+```
+The SSH command will establish a connection to the bastion host and forward the specified local port to the target machine. You may be prompted to enter the password or use a private key for authentication.
+
+Now, you can access the target machine on the forwarded port using localhost and the specified local port. For example, if you forwarded an HTTP service on port 80, you can access it in your browser using the address http://localhost:8080.
+```
+
 
