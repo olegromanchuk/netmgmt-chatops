@@ -37,7 +37,7 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run -d -p 8000:8000 -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} --name netmgmtchatops ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          docker run -d -p 8000:8000 -e WEBEX_BOT_TOKEN=${{ secrets.WEBEX_BOT_TOKEN }} -e RESTCONF_USERNAME=${{ secrets.RESTCONF_USERNAME }} -e RESTCONF_PASSWORD=${{ secrets.RESTCONF_PASSWORD }} -e DEVICE_IP_PORT=${{ secrets.DEVICE_IP_PORT }} --name netmgmtchatops ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
       - name: Test Docker container
         run: |

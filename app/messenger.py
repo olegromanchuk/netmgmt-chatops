@@ -5,7 +5,7 @@ import os
 from urllib.parse import urlparse, parse_qs
 from pprint import pprint
 
-TOKEN=os.getenv('BOT_TOKEN')
+TOKEN=os.getenv('WEBEX_BOT_TOKEN')
 
 BASE_URL = "https://webexapis.com/v1"
 
