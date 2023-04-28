@@ -10,7 +10,7 @@ TOKEN=os.getenv('BOT_TOKEN')
 BASE_URL = "https://webexapis.com/v1"
 
 max_items=3
-room_id='sasa'
+room_id=''
 
 class Messenger():
     def __init__(self, base_url=BASE_URL, api_key=TOKEN):
