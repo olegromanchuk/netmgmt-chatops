@@ -2,15 +2,16 @@ import requests
 import os
 import sys
 
-if os.getenv('RESTCONF_USERNAME') is None or os.getenv('RESTCONF_USERNAME') == '' or os.getenv('RESTCONF_PASSWORD') is None or os.getenv('RESTCONF_PASSWORD') == '':
-    raise ValueError('Please set the RESTCONF_USERNAME and RESTCONF_PASSWORD environment variable')
+if os.getenv('DEVICE_IP_PORT') is None or os.getenv('DEVICE_IP_PORT') == '' or os.getenv('RESTCONF_USERNAME') is None or os.getenv('RESTCONF_USERNAME') == '' or os.getenv('RESTCONF_PASSWORD') is None or os.getenv('RESTCONF_PASSWORD') == '':
+    raise ValueError('Please set the RESTCONF_USERNAME and RESTCONF_PASSWORD and DEVICE_IP_PORT environment variable')
 
 # device's information
 device_username = os.environ["RESTCONF_USERNAME"]
 device_password = os.environ["RESTCONF_PASSWORD"]
+device_ip_port = os.environ["DEVICE_IP_PORT"]
     
 class Device():
-    def __init__(self, device_ip_port, device_username=device_username, device_password=device_password):
+    def __init__(self, device_ip_port=device_ip_port, device_username=device_username, device_password=device_password):
         self.device_username=device_username
         self.device_password=device_password
         self.device_ip_port=device_ip_port

@@ -1,12 +1,12 @@
 # How to use
-1. export ${BOT_TOKEN} (check the file .env)
+1. export ${WEBEX_BOT_TOKEN} (check the file .env)
 2. Run ngrok: `ngrok http 8000`
 3. Paste url from ngrok (https://69f4-100-2-209-180.ngrok.io) into postman "Webex -> Update webhook -> targetUrl"  
 NOTE: update only base url. Leave /message-events  
 Or use the curl below. Replace "targetUrl" with the ngrok url from above.
 ```
 curl --location --request PUT 'https://webexapis.com/v1/webhooks/Y2lzY29zcGFyazovL3VybjpURUFNOnVzLXdlc3QtMl9yL1dFQkhPT0svNzlmN2Y4ZjYtZTBiNy00ZTI4LTlmZWYtMGQ3YTRlNTkyMGM3' \
---header "Authorization: Bearer ${BOT_TOKEN}" \
+--header "Authorization: Bearer ${WEBEX_BOT_TOKEN}" \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "name": "webhookNetMgmt",
@@ -17,6 +17,12 @@ curl --location --request PUT 'https://webexapis.com/v1/webhooks/Y2lzY29zcGFyazo
 
 
 ## Install
+1. Set env variables: WEBEX_BOT_TOKEN, RESTCONF_USERNAME, RESTCONF_PASSWORD, DEVICE_IP_PORT
+2. Run
+```
+docker run -p 8000:8000 -e WEBEX_BOT_TOKEN=${WEBEX_BOT_TOKEN} -e RESTCONF_USERNAME=${RESTCONF_USERNAME} -e RESTCONF_PASSWORD=${RESTCONF_PASSWORD} -e DEVICE_IP_PORT=${DEVICE_IP_PORT} --name netmgmtchatops kravetc/netmgmtchatops
+```
+
 
 1. Setup env
 ```
@@ -28,7 +34,7 @@ pip install -r requirements.txt
 2. Create webhook (if needed)
 ```
 curl --location --request POST 'https://webexapis.com/v1/webhooks' \
---header "Authorization: Bearer ${BOT_TOKEN}" \
+--header "Authorization: Bearer ${WEBEX_BOT_TOKEN}" \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "name": "webhookNetMgmt",
@@ -39,10 +45,12 @@ curl --location --request POST 'https://webexapis.com/v1/webhooks' \
 ``` 
 
 
+# Development
+
 ## Docker version
 IMAGE_VERSION=netmgmtchatops:version1.0
 docker build -t ${IMAGE_VERSION} .
-docker run -p 8000:8000 -e BOT_TOKEN=${BOT_TOKEN} --name netmgmtchatops ${IMAGE_VERSION}
+docker run -p 8000:8000 -e WEBEX_BOT_TOKEN=${WEBEX_BOT_TOKEN} -e RESTCONF_USERNAME=${RESTCONF_USERNAME} -e RESTCONF_PASSWORD=${RESTCONF_PASSWORD} --name netmgmtchatops ${IMAGE_VERSION}
 
 
 ## Debug in Visual Studio Code

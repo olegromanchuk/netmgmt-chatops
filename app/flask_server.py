@@ -51,13 +51,13 @@ def welcomeRoot():
 
         elif action == 'get_hostname':
             app.logger.debug(f"action: get_hostname")
-            device = Device("localhost:8443")
+            device = Device()
             try:
                 hostname = device.get_hostname()
                 messenger.send_message(room_id, f"hostname: {hostname}")
             except Exception as e:
                 app.logger.error(f"Error: 7001 failed to get hostname. Error: {e}")
-                messenger.send_message(room_id, f"Error: 7001 failed to get hostname: cannot connect to device")
+                messenger.send_message(room_id, f"Error: 7001. Mgs: failed to get hostname: cannot connect to device")
         else:
         # unknown action
             app.logger.debug(f"unknown action: {action}")
@@ -87,6 +87,6 @@ def welcomeRoot():
     return "Message processed"
 
 if __name__ == '__main__':
-    if os.getenv('BOT_TOKEN') is None or os.getenv('BOT_TOKEN') == '':
-        raise ValueError ("Please set the BOT_TOKEN environment variable")
+    if os.getenv('WEBEX_BOT_TOKEN') is None or os.getenv('WEBEX_BOT_TOKEN') == '':
+        raise ValueError ("Please set the WEBEX_BOT_TOKEN environment variable")
     app.run(host='0.0.0.0', port=8000)
