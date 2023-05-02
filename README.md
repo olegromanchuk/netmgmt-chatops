@@ -21,7 +21,7 @@ curl --location --request PUT 'https://webexapis.com/v1/webhooks/Y2lzY29zcGFyazo
 --header 'Content-Type: application/json' \
 --data-raw '{
   "name": "webhookNetMgmt",
-  "targetUrl": "https://e1a3-100-2-209-180.ngrok-free.app/message-events"
+  "targetUrl": "https://ce55-100-2-209-180.ngrok-free.app/message-events"
 }'
 ```
 4. start the app: `./flask_server.py`
@@ -39,17 +39,7 @@ pip install -r requirements.txt
 ```
 
 2. Create webhook (if needed)
-```
-curl --location --request POST 'https://webexapis.com/v1/webhooks' \
---header "Authorization: Bearer ${WEBEX_BOT_TOKEN}" \
---header 'Content-Type: application/json' \
---data-raw '{
-  "name": "webhookNetMgmt",
-  "targetUrl": "https://9554-100-2-209-180.ngrok-free.app/message-events",
-  "resource": "messages",
-  "event": "created"
-}'
-``` 
+See the section "How to configure webex bot"
 
 ## Docker version
 IMAGE_VERSION=netmgmtchatops:version1.0
