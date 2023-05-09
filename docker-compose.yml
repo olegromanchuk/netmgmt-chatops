@@ -4,6 +4,11 @@ services:
     image: netmgmtchatops:latest
     ports:
       - "8000:8000"
+    environment:
+      WEBEX_BOT_TOKEN: ${WEBEX_BOT_TOKEN}
+      RESTCONF_USERNAME: ${RESTCONF_USERNAME}
+      RESTCONF_PASSWORD: ${RESTCONF_PASSWORD}
+      DEVICE_IP_PORT: ${DEVICE_IP_PORT}
     deploy:
       replicas: 1
       update_config:

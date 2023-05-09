@@ -5,38 +5,35 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, trexnew]
+    runs-on: [self-hosted]
     env:
       DOCKER_IMAGE_NAME: netmgmtchatops
+      SERVICE_NAME: netmgmt-chatops
 
     steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
       - name: Pull the latest Docker image
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+        run: | 
+          echo ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest ${{ env.DOCKER_IMAGE_NAME }}:latest
 
-      - name: Check if /opt/netmgmt-chatops directory exists
-        run: |
-          if [ ! -d /opt/netmgmt-chatops ]; then
-            sudo mkdir -p /opt/netmgmt-chatops
-          fi
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Check if docker-compose.yml exists
-        id: check_docker_compose
+      - name: Check that docker-compose.yml is valid
         run: |
-          if [ -f /opt/netmgmt-chatops/docker-compose.yml ]; then
-            echo "::set-output name=exists::true"
-          else
-            echo "::set-output name=exists::false"
-          fi
+          sudo docker-compose -f docker-compose.yml config
 
-      - name: Download docker-compose.yml from GitHub repo
-        if: steps.check_docker_compose.outputs.exists == 'false'
+      - name: Update docker swarm service
         run: |
-          # Download the docker-compose.yml file
-          # Use the github context variables to get the URL of the docker-compose.yml file in the current repository
-          # Note: This assumes the file is publicly accessible, otherwise you need to authenticate the request
-          sudo curl -L https://raw.githubusercontent.com/${{ github.repository }}/main/docker-compose.yml -o /opt/netmgmt-chatops/docker-compose.yml
-
-      - name: Deploy to production server
-        run: |
-          # Update the Docker Swarm service
-          sudo docker service update --image ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest netmgmt-chatops
+          export WEBEX_BOT_TOKEN=${{ secrets.WEBEX_BOT_TOKEN }}
+          export RESTCONF_USERNAME=${{ secrets.RESTCONF_USERNAME }}
+          export RESTCONF_PASSWORD=${{ secrets.RESTCONF_PASSWORD }}
+          export DEVICE_IP_PORT=${{ secrets.DEVICE_IP_PORT }}
+          docker stack deploy --compose-file docker-compose.yml ${{ env.SERVICE_NAME }}

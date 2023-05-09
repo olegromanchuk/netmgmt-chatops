@@ -78,7 +78,7 @@ and hit F5 to run the "ChatOps" launch configuration, or by clicking the ChatOps
 
 ## Restconf for local development
 Works starting from IOS XE version 16.06
-# Next line will forward traffic on bastion host 8443->443 to cisco.with.ios-xe.restconf.host
+# Next line will forward traffic on bastion host 8443 -> cisco.with.ios-xe.restconf.host:433
 # same as iptables -t nat -A PREROUTING -p tcp --dport 8443 -j DNAT --to-destination 192.168.1.100:443
 
 ```
