@@ -26,16 +26,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Insert secrets into docker-compose.yml
+        run: |
+          sed -i 's/${WEBEX_BOT_TOKEN}/'"${{ secrets.WEBEX_BOT_TOKEN }}"'/g' docker-compose.yml
+          sed -i 's/${RESTCONF_USERNAME}/'"${{ secrets.RESTCONF_USERNAME }}"'/g' docker-compose.yml
+          sed -i 's/${RESTCONF_PASSWORD}/'"${{ secrets.RESTCONF_PASSWORD }}"'/g' docker-compose.yml
+          sed -i 's/${DEVICE_IP_PORT}/'"${{ secrets.DEVICE_IP_PORT }}"'/g' docker-compose.yml
+
       - name: Check that docker-compose.yml is valid
         run: |
           sudo docker-compose -f docker-compose.yml config
 
-      - name: Create .env file with secrets
-        run: |
-          echo WEBEX_BOT_TOKEN=${{ secrets.WEBEX_BOT_TOKEN }} >> .env
-          echo RESTCONF_USERNAME=${{ secrets.RESTCONF_USERNAME }} >> .env
-          echo RESTCONF_PASSWORD=${{ secrets.RESTCONF_PASSWORD }} >> .env
-          echo DEVICE_IP_PORT=${{ secrets.DEVICE_IP_PORT }} >> .env
+      # - name: Create .env file with secrets TODO: write a loader to use it or swarm secrets
+      #   run: |
+      #     echo WEBEX_BOT_TOKEN=${{ secrets.WEBEX_BOT_TOKEN }} >> .env
+      #     echo RESTCONF_USERNAME=${{ secrets.RESTCONF_USERNAME }} >> .env
+      #     echo RESTCONF_PASSWORD=${{ secrets.RESTCONF_PASSWORD }} >> .env
+      #     echo DEVICE_IP_PORT=${{ secrets.DEVICE_IP_PORT }} >> .env
 
       - name: Update docker swarm service
         run: |

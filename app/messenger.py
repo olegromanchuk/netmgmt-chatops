@@ -23,6 +23,7 @@ class Messenger():
             'Content-Type': 'application/json'
         }
         self.bot_id=requests.get(f'{base_url}/people/me', headers=self.headers).json().get('id')
+        self.debug=False
 
     def get_message(self, message_id):
         received_message_url=f'{self.base_url}/messages/{message_id}'

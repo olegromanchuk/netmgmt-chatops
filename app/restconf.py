@@ -1,6 +1,22 @@
 import requests
 import os
 import sys
+import logging
+
+# Create a custom logger
+restconf_logger = logging.getLogger(__name__)
+
+# Create handlers
+c_handler = logging.StreamHandler()
+
+# Create formatters and add it to handlers
+c_format = logging.Formatter('[%(asctime)s] %(levelname)s in %(name)s: %(message)s')
+c_handler.setFormatter(c_format)
+
+# Add handlers to the logger
+restconf_logger.addHandler(c_handler)
+
+
 
 if os.getenv('DEVICE_IP_PORT') is None or os.getenv('DEVICE_IP_PORT') == '' or os.getenv('RESTCONF_USERNAME') is None or os.getenv('RESTCONF_USERNAME') == '' or os.getenv('RESTCONF_PASSWORD') is None or os.getenv('RESTCONF_PASSWORD') == '':
     raise ValueError('Please set the RESTCONF_USERNAME and RESTCONF_PASSWORD and DEVICE_IP_PORT environment variable')
@@ -11,7 +27,7 @@ device_password = os.environ["RESTCONF_PASSWORD"]
 device_ip_port = os.environ["DEVICE_IP_PORT"]
     
 class Device():
-    def __init__(self, device_ip_port=device_ip_port, device_username=device_username, device_password=device_password):
+    def __init__(self, device_ip_port=device_ip_port, device_username=device_username, device_password=device_password, debug=False):
         self.device_username=device_username
         self.device_password=device_password
         self.device_ip_port=device_ip_port
@@ -20,10 +36,15 @@ class Device():
                 "Content-Type": "application/yang-data+json"
             }
         self.auth=(self.device_username, self.device_password)
+        if debug:
+            restconf_logger.setLevel(logging.DEBUG)
+        
 
     def get_hostname(self):
         yang_url = f"https://{self.device_ip_port}/restconf/data/Cisco-IOS-XE-native:native/hostname"
+        restconf_logger.info(f"Logger-restconf-get_hostname. Url: {yang_url}")
         try:
+            restconf_logger.debug(f"sending GET to restconf host. url: {yang_url}, auth: {self.auth}, headers:{self.headers}")
             response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
         except Exception as e:
             raise ConnectionError(f"ConnectionError: {e}")

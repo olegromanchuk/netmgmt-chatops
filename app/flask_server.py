@@ -21,7 +21,6 @@ def backupRoute():
 
 @app.route('/message-events', methods=['POST'])
 def welcomeRoot():
-    app.logger.setLevel("DEBUG")
     data = request.get_json()
     message_id=data['data']['id']
     room_id=data['data']['roomId']
@@ -33,6 +32,10 @@ def welcomeRoot():
 
     # Get message details
     messenger = Messenger()
+    if app.debug == False:
+        messenger.debug = False
+    else:
+        messenger.debug = True
     messenger.get_message(message_id)
     app.logger.info(f"got msg body: {messenger.message_text}")
     if messenger.message_text.startswith('/server'):
@@ -51,13 +54,19 @@ def welcomeRoot():
 
         elif action == 'get_hostname':
             app.logger.debug(f"action: get_hostname")
-            device = Device()
+            device = Device(debug=messenger.debug)
+            hostname=''
             try:
                 hostname = device.get_hostname()
-                messenger.send_message(room_id, f"hostname: {hostname}")
             except Exception as e:
                 app.logger.error(f"Error: 7001 failed to get hostname. Error: {e}")
                 messenger.send_message(room_id, f"Error: 7001. Mgs: failed to get hostname: cannot connect to device")
+            app.logger.debug(f"got hostname: {hostname}")
+            try:
+                messenger.send_message(room_id, f"hostname: {hostname}")
+            except Exception as e:
+                app.logger.error(f"Error: 7002 failed to send hostname. Error: {e}")
+                messenger.send_message(room_id, f"Error: 7002. Mgs: failed to send hostname: cannot connect to device")
         else:
         # unknown action
             app.logger.debug(f"unknown action: {action}")
@@ -89,4 +98,11 @@ def welcomeRoot():
 if __name__ == '__main__':
     if os.getenv('WEBEX_BOT_TOKEN') is None or os.getenv('WEBEX_BOT_TOKEN') == '':
         raise ValueError ("Please set the WEBEX_BOT_TOKEN environment variable")
+    if os.getenv('DEBUG_NETOPS') is None or os.getenv('DEBUG_NETOPS') in ['False', 'false', '0', '']:
+        app.logger.info(f"DEBUG_NETOPS: {os.getenv('DEBUG_NETOPS')}")
+        app.debug = False
+    else:
+        app.debug = True
+        app.logger.info(f"DEBUG_NETOPS: {os.getenv('DEBUG_NETOPS')}")
+        app.logger.setLevel("DEBUG")
     app.run(host='0.0.0.0', port=8000)
