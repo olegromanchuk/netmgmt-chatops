@@ -30,10 +30,13 @@ jobs:
         run: |
           sudo docker-compose -f docker-compose.yml config
 
+      - name: Create .env file with secrets
+        run: |
+          echo WEBEX_BOT_TOKEN=${{ secrets.WEBEX_BOT_TOKEN }} >> .env
+          echo RESTCONF_USERNAME=${{ secrets.RESTCONF_USERNAME }} >> .env
+          echo RESTCONF_PASSWORD=${{ secrets.RESTCONF_PASSWORD }} >> .env
+          echo DEVICE_IP_PORT=${{ secrets.DEVICE_IP_PORT }} >> .env
+
       - name: Update docker swarm service
         run: |
-          export WEBEX_BOT_TOKEN=${{ secrets.WEBEX_BOT_TOKEN }}
-          export RESTCONF_USERNAME=${{ secrets.RESTCONF_USERNAME }}
-          export RESTCONF_PASSWORD=${{ secrets.RESTCONF_PASSWORD }}
-          export DEVICE_IP_PORT=${{ secrets.DEVICE_IP_PORT }}
           docker stack deploy --compose-file docker-compose.yml ${{ env.SERVICE_NAME }}

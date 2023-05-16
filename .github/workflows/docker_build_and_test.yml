@@ -48,15 +48,6 @@ jobs:
 
   deploy:
     needs: build_and_test
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/deploy_to_docker_swarm.yml
     secrets: inherit
-
-      # - name: Trigger deploy
-      #   run: |
-      #     curl -X POST \
-      #       -H "Authorization: token ${{ secrets.REPO_DISPATCH_TOKEN }}" \
-      #       -H "Content-Type: application/json" \
-      #       -d '{"event_type": "deploy"}' \
-      #       https://api.github.com/repos/${{ github.repository }}/dispatches
-
 
