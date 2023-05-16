@@ -1,20 +1,20 @@
-# Network management chatops
-Network management chatops connects webex chat (frontend) with the restconf scripts that accepts commands from chat and sends them to devices (backend)
+# Netchatops
+Network management chatops connects [webex](https://www.webex.com) chat (frontend) with the restconf scripts that accepts commands from chat and sends them to devices (backend).
 
-# Run in docker
-1. Set env variables: WEBEX_BOT_TOKEN, RESTCONF_USERNAME, RESTCONF_PASSWORD, DEVICE_IP_PORT
-2. Run
-```
-docker run -p 8000:8000 -e WEBEX_BOT_TOKEN=${WEBEX_BOT_TOKEN} -e RESTCONF_USERNAME=${RESTCONF_USERNAME} -e RESTCONF_PASSWORD=${RESTCONF_PASSWORD} -e DEVICE_IP_PORT=${DEVICE_IP_PORT} --name netmgmtchatops kravetc/netmgmtchatops
-```
+## Getting Started
+
+First, you need to create a webex bot application. Webex is free. Create an account on [webex](https://www.webex.com) and follow instructions on the [developer.webex.com](https://developer.webex.com/) to create a bot.
+
+Second, you need to have a device that supports restconf. Cisco IOS XE supports restconf from version 16.06. Note, that redundancy SSO on ASR is currently not supported along with restconf (at least on 16.X).
 
 
 ## How to configure webex bot
-1. export ${WEBEX_BOT_TOKEN} (check the file .env)
+If you already configured bot you can skip this part.
+
+### Run in test mode via ngrok
+1. export ${WEBEX_BOT_TOKEN} (check the file .env_example)
 2. Run ngrok: `ngrok http 8000`
-3. Paste url from ngrok (https://69f4-100-2-209-180.ngrok.io) into postman "Webex -> Update webhook -> targetUrl"  
-NOTE: update only base url. Leave /message-events  
-Or use the curl below. Replace "targetUrl" with the ngrok url from above.
+3. Paste url from ngrok (https://69f4-100-2-209-180.ngrok.io) into curl below. Replace "targetUrl" with the ngrok url from above. Replace webhookID on actual webhookID that you created. 
 ```
 curl --location --request PUT 'https://webexapis.com/v1/webhooks/Y2lzY29zcGFyazovL3VybjpURUFNOnVzLXdlc3QtMl9yL1dFQkhPT0svNzlmN2Y4ZjYtZTBiNy00ZTI4LTlmZWYtMGQ3YTRlNTkyMGM3' \
 --header "Authorization: Bearer ${WEBEX_BOT_TOKEN}" \
@@ -24,6 +24,23 @@ curl --location --request PUT 'https://webexapis.com/v1/webhooks/Y2lzY29zcGFyazo
   "targetUrl": "https://ce55-100-2-209-180.ngrok-free.app/message-events"
 }'
 ```
+
+
+### Run in docker
+1. Set env variables:
+``` 
+export WEBEX_BOT_TOKEN='myToken'
+export RESTCONF_USERNAME='myRestConfDeviceName'
+export RESTCONF_PASSWORD='myRestConfDevicePass'
+export DEVICE_IP_PORT='deviceIP:port'
+```
+
+2. Run
+```
+docker run -p 8000:8000 -e WEBEX_BOT_TOKEN=${WEBEX_BOT_TOKEN} -e RESTCONF_USERNAME=${RESTCONF_USERNAME} -e RESTCONF_PASSWORD=${RESTCONF_PASSWORD} -e DEVICE_IP_PORT=${DEVICE_IP_PORT} --name netmgmtchatops kravetc/netmgmtchatops
+```
+
+
 4. start the app: `./flask_server.py`
 
 
@@ -78,8 +95,8 @@ and hit F5 to run the "ChatOps" launch configuration, or by clicking the ChatOps
 
 ## Restconf for local development
 Works starting from IOS XE version 16.06
-# Next line will forward traffic on bastion host 8443 -> cisco.with.ios-xe.restconf.host:433
-# same as iptables -t nat -A PREROUTING -p tcp --dport 8443 -j DNAT --to-destination 192.168.1.100:443
+Next line will forward traffic on bastion host 8443 -> cisco.with.ios-xe.restconf.host:433
+same as `iptables -t nat -A PREROUTING -p tcp --dport 8443 -j DNAT --to-destination 192.168.1.100:443`
 
 ```
 sudo ssh -L 8443:cisco.with.ios-xe.restconf.host:443 root@bastion.host -N
