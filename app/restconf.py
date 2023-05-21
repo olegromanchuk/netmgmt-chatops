@@ -42,11 +42,13 @@ class Device():
 
     def get_hostname(self):
         yang_url = f"https://{self.device_ip_port}/restconf/data/Cisco-IOS-XE-native:native/hostname"
-        restconf_logger.info(f"Logger-restconf-get_hostname. Url: {yang_url}")
+        restconf_logger.debug(f"sending GET to restconf host. url: {yang_url}, headers:{self.headers}")
+        response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
         try:
-            restconf_logger.debug(f"sending GET to restconf host. url: {yang_url}, auth: {self.auth}, headers:{self.headers}")
-            response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
-        except Exception as e:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 401:
+                raise ValueError(e)
             raise ConnectionError(f"ConnectionError: {e}")
         
         return response.json()['Cisco-IOS-XE-native:hostname']
@@ -57,7 +59,7 @@ class Device():
             try:
                 response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
             except Exception as e:
-                print(f"Got eerror: {e}")
+                print(f"Got error: {e}")
             return response.json()
     
     def get_models(self):
