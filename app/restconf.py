@@ -2,6 +2,7 @@ import requests
 import os
 import sys
 import logging
+import json
 
 # Create a custom logger
 restconf_logger = logging.getLogger(__name__)
@@ -42,23 +43,80 @@ class Device():
 
     def get_hostname(self):
         yang_url = f"https://{self.device_ip_port}/restconf/data/Cisco-IOS-XE-native:native/hostname"
-        restconf_logger.info(f"Logger-restconf-get_hostname. Url: {yang_url}")
+        restconf_logger.debug(f"sending GET to restconf host. url: {yang_url}, headers:{self.headers}")
+        response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
         try:
-            restconf_logger.debug(f"sending GET to restconf host. url: {yang_url}, auth: {self.auth}, headers:{self.headers}")
-            response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
-        except Exception as e:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 401:
+                raise ValueError(f"Authentication failed. Please check the RESTCONF_USERNAME and RESTCONF_PASSWORD environment variable. Error: {e}")
             raise ConnectionError(f"ConnectionError: {e}")
-        
         return response.json()['Cisco-IOS-XE-native:hostname']
 
     def get_interfaces(self):
             # yang_url = f"https://{self.device_ip_port}/restconf/data/Cisco-IOS-XE-native:native/interface/Port-channel=5/ip/address"
             yang_url = f"https://{self.device_ip_port}/restconf/data/Cisco-IOS-XE-native:native/interface"
+            restconf_logger.debug(f"sending GET to restconf host. url: {yang_url}, headers:{self.headers}")
+            response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
             try:
-                response = requests.get(yang_url, auth=self.auth, headers=self.headers, verify=False)
-            except Exception as e:
-                print(f"Got eerror: {e}")
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                if response.status_code == 401:
+                    raise ValueError(f"Authentication failed. Please check the RESTCONF_USERNAME and RESTCONF_PASSWORD environment variable. Error: {e}")
+                raise ConnectionError(f"ConnectionError: {e}")
             return response.json()
+    
+
+    def create_interface_ge(self, interface_name, interface_ip, interface_mask):
+        if interface_name is None or interface_name == '':
+            raise ValueError('interface_name is required')
+        
+        interface_type = 'GigabitEthernet'
+
+        # Define the URL for the POST request
+        yang_url = f"https://{self.device_ip_port}/restconf/data/Cisco-IOS-XE-native:native"
+        restconf_logger.debug(f"sending POST to restconf host. url: {yang_url}, headers:{self.headers}")
+
+       
+        # Define the body of the POST request
+        payload = {
+            "Cisco-IOS-XE-native:native": {
+                "interface": {
+                    interface_type: [{
+                        "name": interface_name,
+                        "ip": {
+                            "address": {
+                                "primary": {
+                                    "address": interface_ip,
+                                    "mask": interface_mask
+                                }
+                            }
+                        },
+                        "Cisco-IOS-XE-ethernet:negotiation": {
+                            "auto": True
+                        }
+                    }]
+                }
+            }
+        }
+
+        response = requests.post(yang_url, auth=self.auth, headers=self.headers, json=payload, verify=False)
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 401:
+                raise ValueError(f"Authentication failed. Please check the RESTCONF_USERNAME and RESTCONF_PASSWORD environment variable. Error: {e}")
+            raise ConnectionError(f"ConnectionError: {e}")
+        
+        # Check if the request was successful
+        if response.status_code == 201:
+            return_msg=f"Interface {interface_type} {interface_name} created successfully. Msg: {response.json()}"
+        else:
+            restconf_logger.error(f"Failed to create interface. Status code: {response.status_code}. Response: {response.text}.")
+            raise ConnectionError(f"Failed to create interface. Status code: {response.status_code}. Response: {response.text}.")
+
+        return return_msg
+
     
     def get_models(self):
         #yang_url = f"https://{device_ip_port}/restconf/data/Cisco-IOS-XE-native:native"
