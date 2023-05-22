@@ -4,7 +4,7 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from messenger import Messenger
-from restconf import Device
+from restconf import Device, RestConfException
 from tabulate import tabulate
 import datetime as dtc
 import os
@@ -45,16 +45,31 @@ def create_interface_via_device(debug=False, interface_name=None, interface_ip=N
         return result_message
     
     device = Device(debug=debug)
-    interfaces_info=''
+    result_message=''
     try:
-        interfaces_info = device.create_interface_ge(interface_name=interface_name, interface_ip=interface_ip, interface_mask=interface_mask)
+        result_message = device.create_interface_portchannel(interface_name=interface_name, interface_ip=interface_ip, interface_mask=interface_mask)
     except Exception as e:
-        app.logger.error(f"Error: 7003 failed to create interface. Error: {e}")
-        result_message = f"Error: 7003. Mgs: failed to create interface: cannot connect to device"
-        return result_message
-    app.logger.debug(f"got interfaces: {interfaces_info}")
-    parsed_output = parse_interfaces(interfaces_info)
-    return f"hostname: {parsed_output}"
+        if isinstance(e, ConnectionError):
+            app.logger.error(f"Error: 7003 failed to create interface. Error: {e}")
+            result_message = f"Error: 7003. Mgs: failed to create interface: cannot connect to device"
+        if isinstance(e, RestConfException):
+            app.logger.error(f"Error: 706x failed to create interface. Error: {e}. Details: {e.dict_data}")
+
+            # form clear error message for user
+            if e.dict_data["error-tag"]== "data-exists":
+                result_message = f"Error: 7060. Mgs: creation failed. Object already exists."
+            elif e.dict_data["error-tag"]== "authentication-failed":
+                result_message = f"Error: 7061. Mgs: creation failed. Authentication failed."
+            elif e.dict_data["error-tag"]== "invalid-value":
+                result_message = f"Error: 7062. Mgs: creation failed. Restconf device rejected our request."
+            elif e.dict_data["error-tag"]== "unknown-error":
+                result_message = f"Error: 7063. Mgs: creation failed. Request was processed, but not 201 returned."
+            else:
+                result_message = f"Error: 7064. Mgs: failed to create interface. Restconf device rejected our request."
+
+        elif isinstance(e, Exception):
+            app.logger.error(f"Error: 7005 failed to create interface. Error: {e}")
+    return result_message
 
 
 def parse_interfaces(data):
@@ -147,7 +162,7 @@ def welcomeRoot():
             msg = get_interfaces(debug=messenger.debug)
             messenger.send_message(room_id, msg)
 
-        if action == 'create_intf_ge':
+        if action == 'create_intf_portchannel':
             action_found = True
             app.logger.debug(f"action: {action}")
             try:
