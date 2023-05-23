@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   netmgmt-chatops:
-    image: netmgmtchatops:latest
+    image: ${DOCKERHUB_USERNAME}/netmgmtchatops:latest
     ports:
       - "8000:8000"
     environment:
