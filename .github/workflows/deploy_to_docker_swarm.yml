@@ -46,4 +46,4 @@ jobs:
 
       - name: Update docker swarm service
         run: |
-          docker stack deploy --compose-file docker-compose.yml ${{ env.SERVICE_NAME }}
+          docker stack deploy --compose-file docker-compose.yml --resolve-image changed ${{ env.SERVICE_NAME }}
