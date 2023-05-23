@@ -54,6 +54,14 @@ pip install -r requirements.txt
 start the app: `./flask_server.py`
 ```
 
+## Available links
+
+* /hello world (test)
+* /server status (dummy)
+* /server get_intf
+* /server get_hostname
+* /server create_intf_portchannel 16 172.16.16.5 255.255.255.0
+
 
 
 # Development
