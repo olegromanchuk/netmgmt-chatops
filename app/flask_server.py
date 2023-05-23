@@ -34,8 +34,8 @@ def get_interfaces(debug=False):
         result_message = f"Error: 7002. Mgs: failed to get interfaces: cannot connect to device"
         return result_message
     app.logger.debug(f"got interfaces: {interfaces_info}")
-    parsed_output = parse_interfaces(interfaces_info)
-    return f"hostname: {parsed_output}"
+    nice_tabulated_output = parse_interfaces(interfaces_info)
+    return nice_tabulated_output
 
 
 def create_interface_via_device(debug=False, interface_name=None, interface_ip=None, interface_mask=None):
