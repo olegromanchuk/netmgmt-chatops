@@ -1,6 +1,9 @@
 # Netchatops
 Network management chatops connects [webex](https://www.webex.com) chat (frontend) with the restconf scripts that accepts commands from chat and sends them to devices (backend).
 
+# IMPORTANT!!!
+The app is in active development stage. Many functions are just a boilerplace code that you can improve and add your own functionaly. Do not expect that everything will work as in the finished product, but rather use it as a boilerplate.
+
 ## Getting Started
 
 First, you need to create a webex bot application. Webex is free. Create an account on [webex](https://www.webex.com) and follow instructions on the [developer.webex.com](https://developer.webex.com/) to create a bot.
@@ -19,9 +22,10 @@ If you are behind NAT you can use ngrok, or port forwarding on the router.
 ### Run in test mode via ngrok on local machine
 1. export ${WEBEX_BOT_TOKEN} (check the file .env_example)
 2. Run ngrok: `ngrok http 8000`
-3. Paste url from ngrok (https://69f4-100-2-209-180.ngrok.io) into curl below. Replace "targetUrl" with the ngrok url from above. Replace webhookID on actual webhookID that you created. 
+3. Paste url from ngrok (https://69f4-100-2-209-180.ngrok.io) into curl below. Replace "targetUrl" with the ngrok url from above. Replace WEBHOOK_ID on actual webhookID that you created in webex app. 
 ```
-curl --location --request PUT 'https://webexapis.com/v1/webhooks/Y2lzY29zcGFyazovL3VybjpURUFNOnVzLXdlc3QtMl9yL1dFQkhPT0svNzlmN2Y4ZjYtZTBiNy00ZTI4LTlmZWYtMGQ3YTRlNTkyMGM3' \
+export WEBHOOK_ID='Y2lzYbjpURUFNOnVzLXdlc3QtMl9yL1dFQkhPT0svNzlmN2Y4ZjYtZTBiNy00ZTI4LTlmZWYtMGQ3Y'
+curl --location --request PUT "https://webexapis.com/v1/webhooks/${WEBHOOK_ID}" \
 --header "Authorization: Bearer ${WEBEX_BOT_TOKEN}" \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -46,7 +50,7 @@ docker run -p 8000:8000 -e WEBEX_BOT_TOKEN=${WEBEX_BOT_TOKEN} -e RESTCONF_USERNA
 ```
 
 ### Run locally
-1. Setup env
+1. Setup python local env
 ```
 python3 -m venv env
 source env/bin/activate
@@ -57,14 +61,14 @@ pip install -r requirements.txt
 start the app: `./flask_server.py`
 ```
 
-### Run through fork and github actions
+### Run through github fork and github actions
 The repo contains 2 github workflows that are used to automate build, testing and deployment: 
 1. "docker_build_and_test" - test and upload the container to dockerhub. You must set DOCKERHUB_USERNAME and DOCKERHUB_TOKEN to use your dockerhub account.
 2. "deploy_to_docker_swarm" - deploy the image from dockerhub to a server with docker swarm via github [self-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners).
 
 
 #### Github secrets for github actions
-If you do fork of the project and want to use github actions you need to set next secrets in github forked repo:
+If you do fork of the project and want to use github actions you need to set next secrets in your github forked repo:
 * WEBEX_BOT_TOKEN
 * DOCKERHUB_USERNAME
 * DOCKERHUB_TOKEN
@@ -86,9 +90,9 @@ If you do fork of the project and want to use github actions you need to set nex
 # Development
 
 ### Prepare local development environment
-1. [Setup env variables](#run-locally)
-
-2. [Create webhook (if needed)](#run-in-test-mode-via-ngrok-on-local-machine)
+1. [Setup env variables](#set-env-variables-for-app)
+2. [Prepare python local environment](#run-locally)
+3. [Create webhook (if needed)](#run-in-test-mode-via-ngrok-on-local-machine)
 
 
 ### How to build and run docker version
