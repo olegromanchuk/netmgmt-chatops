@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   netmgmt-chatops:
-    image: netmgmtchatops:latest
+    image: ${DOCKERHUB_USERNAME}/netmgmtchatops:latest
     ports:
       - "8000:8000"
     environment:
@@ -9,6 +9,7 @@ services:
       RESTCONF_USERNAME: ${RESTCONF_USERNAME}
       RESTCONF_PASSWORD: ${RESTCONF_PASSWORD}
       DEVICE_IP_PORT: ${DEVICE_IP_PORT}
+      DEBUG_NETOPS: 1
     deploy:
       replicas: 1
       update_config:
