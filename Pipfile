@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-certifi = "==2020.4.5.2"
+certifi = "==2023.7.22"
 chardet = "==3.0.4"
 future = "==0.18.2"
 idna = "==2.9"
